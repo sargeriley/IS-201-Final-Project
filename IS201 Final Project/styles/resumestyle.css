@@ -1,0 +1,112 @@
+/* General Body Styles */
+body {
+    background-color: #e0e0e0; /* Grey background for the browser window */
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    color: #333; /* Dark grey text is softer on eyes than black */
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+}
+
+/* The Paper Sheet */
+.resume-container {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 800px; /* Standard width for readability */
+    margin: 0 auto; /* Centers the paper on the screen */
+    padding: 40px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Adds a subtle drop shadow */
+    box-sizing: border-box; /* Ensures padding doesn't widen the box */
+}
+
+/* Header Styles */
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 36px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.contact-info {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.contact-info a {
+    color: #007bff; /* Standard Link Blue */
+    text-decoration: none;
+}
+
+hr {
+    border: 0;
+    border-top: 2px solid #333;
+    margin: 20px 0;
+}
+
+/* Section Headings */
+h2 {
+    color: #2c3e50; /* Dark Blue-Grey */
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin-top: 30px;
+    text-transform: uppercase;
+    font-size: 18px;
+}
+
+/* Entry Styles (Jobs/Education) */
+.entry {
+    margin-bottom: 20px;
+}
+
+.entry-header {
+    display: flex;
+    justify-content: space-between; /* Pushes date to the right */
+    align-items: baseline;
+}
+
+h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #000;
+}
+
+.date {
+    font-style: italic;
+    color: #666;
+    font-size: 14px;
+}
+
+.company, .degree {
+    margin: 2px 0 8px 0;
+    font-weight: bold;
+    color: #555;
+}
+
+/* List Styles */
+ul {
+    margin-top: 5px;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+/* PRINT SETTINGS (Makes it look perfect when you save as PDF) */
+@media print {
+    body {
+        background: none;
+        padding: 0;
+    }
+    .resume-container {
+        width: 100%;
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+    }
+}

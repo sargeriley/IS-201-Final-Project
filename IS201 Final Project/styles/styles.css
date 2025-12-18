@@ -1,0 +1,69 @@
+h1{
+    text-align: center;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: xx-large;
+}
+
+h2{
+    color:white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+p{
+    color: white;
+}
+
+.header{
+    color: black;
+    background-color: azure;
+    right: 144px;
+    left: 144px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+
+}
+
+
+.footer{
+    background-color: white;
+    color: black;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: large;
+    text-align: center;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.maintext{
+    
+    color:white;
+    background-color: rgba(0, 0, 0, 0.5);
+    font-size: large;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    
+    padding-left: 8px;
+    padding-right: 8px;
+    
+    padding-top: 8px;
+    padding-bottom: 8px;
+    
+}
+
+.boldness{
+    font-weight: bold;
+}
+
+
+.container {
+  display: flex; /* This magically aligns children in a row */
+}
+
+.left-box {
+  width: 49%; /* Takes up left half */
+  margin-right: 4px;
+}
+
+.right-box {
+  width: 49%; /* Takes up right half */
+  margin-left: 4px;
+}

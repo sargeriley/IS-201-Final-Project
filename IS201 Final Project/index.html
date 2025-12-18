@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Guitars</title>
+    <link rel="stylesheet" href = "styles/styles.css">
+
+    <style>
+    body {
+      /* The image used */
+      background-image: url("images/guitar store 1.jpg");
+
+      /* Recommended settings for full-screen backgrounds */
+      background-color: black; /* Fallback color */
+      height: 120vh; /* Full viewport height */
+      background-position: center; /* Center the image */
+      background-repeat: no-repeat; /* Do not repeat the image */
+      background-size: cover; /* Resize the background image to cover the entire container */
+      background-attachment: fixed;
+    }
+  </style>
+</head>
+<body>
+    <!-- the id for the top and tons of breaks-->
+    <h3 id="top"></h3>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+    <!-- Header -->
+    <div class = "header">
+        <h1>EVERYTHING YOU NEED TO KNOW</h1>
+        <h1>ABOUT ELECTRIC GUITARS</h1>
+    </div> 
+    <br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+    <div class="container"><!-- Giant container for the two side by side boxes-->    
+
+    <!-- Left side box -->
+    <div class = "maintext left-box">
+        <h2>Types of Electric Guitars</h2>
+
+        <ol>
+            <li>Solidbody</li>
+            <p>These are the most common type (like the Fender Stratocaster). Because they have no hollow sound chamber, they can be played at extremely high volumes without feedback, making them perfect for Rock and Metal.</p>
+            <li>Semi-Hollow Body</li>
+            <p>These feature a solid block of wood running down the center, but the wings are hollow. This clever design gives you the warmth of a hollow body but the feedback resistance of a solid body (famous in Blues and Indie rock).</p>
+            <li>Hollowbody</li>
+            <p>Often called "Jazz Boxes," these are fully hollow like an acoustic guitar. They produce a warm, resonant tone perfect for Jazz, but they tend to screech with feedback if you use too much distortion.</p>
+            <li>Types of Pickups</li>
+            <ul>
+                <li><span class = "boldness">Single Coil:</span> A single coil of copper wire around a plastic bobbin with several magnetic pole pieces. Known for a bright, "glassy," and crisp sound. Famous users include Jimi Hendrix and David Gilmour.</li>
+                <li><span class = "boldness">Humbucker:</span> Two coils of copper wire around two seperate bobbins wound in opposite directions with magnetic pole pieces of opposite polarities. Two coils wired together to cancel out background noise ("buck the hum"). They sound thicker, warmer, and louder.</li>
+                <li><span class = "boldness">P-90:</span> A vintage style that sits in the middle—grittier than a single-coil but brighter than a humbucker.</li>
+                
+            </ul>
+            <li>Extended Range Guitars</li>
+            <p>While standard guitars have 6 strings, heavy metal genres (like Djent) often utilize 7, 8, or even 9-string guitars to hit ultra-low bass notes.</p>
+        </ol>
+    </div>
+
+    <!-- Right side box -->
+    <div class = "maintext right-box">
+        <h2>How Electric Guitars Work</h2>
+        <h3>Signal Chain: Pickups - Output Jack - Cable - Amplifier</h3>
+        <ul>
+            <li>When the strings vibrate over the pickups they generate an electrical current.</li>
+            <li>The current travels through a cable to the amplifier where the signal is amplified and altered to the players settings.</li>
+        </ul>
+
+        <img src ="images/guitarpickup.webp" 
+            alt = "pickup anatomy" 
+            height = "500" 
+            style="display: block; margin: 0 auto;">
+    </div>
+
+    </div> <!-- end of the container-->
+    <br>
+    <div class = "maintext"> <!-- Youtube Video-->
+        <h3>Anatomy of the Electric Guitar</h3>
+        
+        <iframe 
+            width="560" 
+            height="315" 
+            src="https://www.youtube.com/embed/iE1Yf_82Vbo" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    </div>
+    <br>
+    <!--Tableau Graph-->
+    <div class = "maintext">
+        <div class='tableauPlaceholder' id='viz1766021015419' style='position: relative'><noscript><a href='#'><img alt='Spotify&#39;s Biggest One Hit Wonders ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SpotifysBiggestOneHitWonders&#47;SpotifysBiggestOneHitWonders&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='SpotifysBiggestOneHitWonders&#47;SpotifysBiggestOneHitWonders' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Sp&#47;SpotifysBiggestOneHitWonders&#47;SpotifysBiggestOneHitWonders&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1766021015419');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='800px';vizElement.style.height='927px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script></div>
+    <br>
+
+    <!-- Footer with the links to everything else-->
+    <div class ="footer">
+        <a href ="#top">Back to Top</a>
+        <a href = "resume.html">Resume</a>
+        <a href = "pong.html">Pong Game</a>
+    </div>
+</body>
+</html>

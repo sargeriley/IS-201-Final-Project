@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Pong Arcade</title>
+    <style>
+        /* --- RETRO ARCADE STYLING --- */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            background-color: #111;
+            color: #33ff00; /* Classic Terminal Green */
+            font-family: 'Press Start 2P', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-shadow: 2px 2px 0px #003300;
+            user-select: none;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .arcade-cabinet {
+            position: relative;
+            border: 4px solid #33ff00;
+            padding: 10px;
+            box-shadow: 0 0 20px #33ff00, inset 0 0 20px #003300;
+            background-color: #000;
+        }
+
+        canvas {
+            display: block;
+            background-color: #000;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        select, button {
+            background: #000;
+            color: #33ff00;
+            border: 2px solid #33ff00;
+            font-family: 'Press Start 2P', monospace;
+            padding: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+            box-shadow: 2px 2px 0px #004400;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        button:hover, select:hover {
+            background-color: #002200;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            width: 800px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .instructions {
+            font-size: 10px;
+            margin-top: 15px;
+            color: #00aa00;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Scanlines & Animation */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            50% { opacity: 1; }
+            100% { opacity: 0.98; }
+        }
+        
+        body { animation: flicker 0.15s infinite; }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <h1>RETRO PONG</h1>
+    
+    <div class="score-board">
+        <span id="playerScore">P1: 0</span>
+        <span id="gameStatus">FIRST TO 7 WINS</span>
+        <span id="aiScore">CPU: 0</span>
+    </div>
+
+    <div class="arcade-cabinet">
+        <canvas id="pongCanvas" width="800" height="400"></canvas>
+    </div>
+
+    <div class="controls">
+        <label>MODE:</label>
+        <select id="gameMode" onchange="updateLabels()">
+            <option value="1P">1 PLAYER (vs CPU)</option>
+            <option value="2P">2 PLAYERS</option>
+        </select>
+
+        <label>DIFFICULTY:</label>
+        <select id="difficulty">
+            <option value="easy">EASY (SLOW)</option>
+            <option value="normal" selected>NORMAL</option>
+            <option value="hard">HARD</option>
+            <option value="impossible">IMPOSSIBLE</option>
+        </select>
+        
+        <button onclick="resetGame()">RESET GAME</button>
+    </div>
+    
+    <div class="instructions" id="controlsText">
+        1P MODE: USE ARROW KEYS OR W/S TO MOVE <br>
+        PRESS 'P' TO PAUSE
+    </div>
+
+    <script>
+        const canvas = document.getElementById('pongCanvas');
+        const context = canvas.getContext('2d');
+        const difficultySelect = document.getElementById('difficulty');
+        const modeSelect = document.getElementById('gameMode');
+        const statusLabel = document.getElementById('gameStatus');
+        const controlsText = document.getElementById('controlsText');
+
+        // Game States
+        let isGameOver = false;
+        let isPaused = false;
+        let isServing = false;
+        const WINNING_SCORE = 7;
+
+        // Ball Object
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 8,
+            speed: 4,
+            dx: 4,
+            dy: 4,
+            color: '#33ff00'
+        };
+
+        const paddleHeight = 80;
+        const paddleWidth = 10;
+
+        // Left Paddle
+        const player1 = {
+            x: 0,
+            y: canvas.height / 2 - paddleHeight / 2,
+            width: paddleWidth,
+            height: paddleHeight,
+            color: '#33ff00',
+            score: 0
+        };
+
+        // Right Paddle
+        const player2 = {
+            x: canvas.width - paddleWidth,
+            y: canvas.height / 2 - paddleHeight / 2,
+            width: paddleWidth,
+            height: paddleHeight,
+            color: '#33ff00',
+            score: 0,
+            speed: 4
+        };
+
+        const net = {
+            x: canvas.width / 2 - 1,
+            y: 0, width: 2, height: 10, color: '#004400'
+        };
+
+        // --- INPUT ---
+        let upPressed = false, downPressed = false, wPressed = false, sPressed = false;
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') upPressed = true;
+            if (e.key === 'ArrowDown') downPressed = true;
+            if (e.key === 'w' || e.key === 'W') wPressed = true;
+            if (e.key === 's' || e.key === 'S') sPressed = true;
+            
+            // PAUSE LOGIC
+            if (e.key === 'p' || e.key === 'P') {
+                if (!isGameOver) {
+                    isPaused = !isPaused;
+                }
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowUp') upPressed = false;
+            if (e.key === 'ArrowDown') downPressed = false;
+            if (e.key === 'w' || e.key === 'W') wPressed = false;
+            if (e.key === 's' || e.key === 'S') sPressed = false;
+        });
+
+        function updateLabels() {
+            if (modeSelect.value === '1P') {
+                document.getElementById('aiScore').innerText = "CPU: " + player2.score;
+                controlsText.innerHTML = "1P MODE: USE ARROW KEYS OR W/S TO MOVE <br> PRESS 'P' TO PAUSE";
+                difficultySelect.disabled = false;
+            } else {
+                document.getElementById('aiScore').innerText = "P2: " + player2.score;
+                controlsText.innerHTML = "P1 (LEFT): W/S KEYS  |  P2 (RIGHT): ARROW KEYS <br> PRESS 'P' TO PAUSE";
+                difficultySelect.disabled = true;
+            }
+        }
+
+        // --- DRAWING ---
+        function drawRect(x, y, w, h, color) {
+            context.fillStyle = color;
+            context.fillRect(x, y, w, h);
+        }
+
+        function drawCircle(x, y, r, color) {
+            context.fillStyle = color;
+            context.beginPath();
+            context.arc(x, y, r, 0, Math.PI * 2, false);
+            context.closePath();
+            context.fill();
+        }
+
+        function drawText(text, x, y, color, size = "45px") {
+            context.fillStyle = color;
+            context.font = `${size} 'Press Start 2P', monospace`;
+            context.fillText(text, x, y);
+        }
+
+        function drawNet() {
+            for (let i = 0; i <= canvas.height; i += 15) {
+                drawRect(net.x, net.y + i, net.width, net.height, net.color);
+            }
+        }
+
+        // --- LOGIC ---
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.dx = 0;
+            ball.dy = 0;
+            isServing = true;
+
+            let newSpeed = 4;
+            let level = difficultySelect.value;
+            if (level === 'easy') newSpeed = 2.5;
+            else if (level === 'normal') newSpeed = 4;
+            else if (level === 'hard') newSpeed = 6;
+            else if (level === 'impossible') newSpeed = 9;
+
+            ball.speed = newSpeed;
+
+            setTimeout(() => {
+                if(isGameOver) return;
+                isServing = false;
+                let dirX = (Math.random() > 0.5 ? 1 : -1);
+                let dirY = (Math.random() > 0.5 ? 1 : -1);
+                ball.dx = dirX * ball.speed;
+                ball.dy = dirY * ball.speed;
+            }, 2000);
+        }
+
+        function movePaddle(paddle, up, down) {
+            if (up && paddle.y > 0) paddle.y -= 8;
+            else if (down && paddle.y < canvas.height - paddle.height) paddle.y += 8;
+        }
+
+        function collision(b, p) {
+            p.top = p.y; p.bottom = p.y + p.height;
+            p.left = p.x; p.right = p.x + p.width;
+            b.top = b.y - b.radius; b.bottom = b.y + b.radius;
+            b.left = b.x - b.radius; b.right = b.x + b.radius;
+            return b.right > p.left && b.bottom > p.top && b.left < p.right && b.top < p.bottom;
+        }
+
+        function update() {
+            // STOP updates if paused or game over
+            if (isGameOver || isPaused) return;
+
+            // Move Paddles
+            let p1Up = wPressed; let p1Down = sPressed;
+            if (modeSelect.value === '1P') {
+                if (upPressed) p1Up = true;
+                if (downPressed) p1Down = true;
+            }
+            movePaddle(player1, p1Up, p1Down);
+
+            if (modeSelect.value === '2P') {
+                movePaddle(player2, upPressed, downPressed);
+            } else {
+                // AI Movement
+                const level = difficultySelect.value;
+                if (level === 'easy') player2.speed = 2.5;
+                else if (level === 'normal') player2.speed = 4.5; 
+                else if (level === 'hard') player2.speed = 8;
+                else if (level === 'impossible') player2.speed = 15;
+
+                if (!isServing && ball.dx > 0) {
+                    if (player2.y + (player2.height / 2) < ball.y - 10) player2.y += player2.speed;
+                    else if (player2.y + (player2.height / 2) > ball.y + 10) player2.y -= player2.speed;
+                }
+                
+                if(player2.y < 0) player2.y = 0;
+                if(player2.y + player2.height > canvas.height) player2.y = canvas.height - player2.height;
+            }
+
+            if (isServing) return;
+
+            // Move Ball
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) ball.dy = -ball.dy;
+
+            let player = (ball.x < canvas.width / 2) ? player1 : player2;
+            if (collision(ball, player)) {
+                let collidePoint = ball.y - (player.y + player.height / 2);
+                collidePoint = collidePoint / (player.height / 2);
+                let angleRad = (Math.PI / 4) * collidePoint;
+                let direction = (ball.x < canvas.width / 2) ? 1 : -1;
+                ball.dx = direction * ball.speed * Math.cos(angleRad);
+                ball.dy = ball.speed * Math.sin(angleRad);
+                ball.speed += 0.2;
+            }
+
+            if (ball.x - ball.radius < 0) {
+                player2.score++;
+                updateScoreBoard();
+                checkWin();
+                resetBall();
+            } else if (ball.x + ball.radius > canvas.width) {
+                player1.score++;
+                updateScoreBoard();
+                checkWin();
+                resetBall();
+            }
+        }
+
+        function updateScoreBoard() {
+            document.getElementById('playerScore').innerText = "P1: " + player1.score;
+            if (modeSelect.value === '1P') document.getElementById('aiScore').innerText = "CPU: " + player2.score;
+            else document.getElementById('aiScore').innerText = "P2: " + player2.score;
+        }
+
+        function checkWin() {
+            if (player1.score >= WINNING_SCORE) endGame("PLAYER 1 WINS!");
+            else if (player2.score >= WINNING_SCORE) {
+                let name = modeSelect.value === '1P' ? "CPU WINS!" : "PLAYER 2 WINS!";
+                endGame(name);
+            }
+        }
+
+        function endGame(winnerText) {
+            isGameOver = true;
+            statusLabel.innerText = "GAME OVER";
+            render(); 
+            drawText(winnerText, 150, 200, "#33ff00");
+            drawText("PRESS RESET", 220, 260, "#33ff00", "30px");
+        }
+
+        function render() {
+            drawRect(0, 0, canvas.width, canvas.height, "#000");
+            drawNet();
+            drawText(player1.score, canvas.width / 4, canvas.height / 5, "#003300");
+            drawText(player2.score, 3 * canvas.width / 4, canvas.height / 5, "#003300");
+            drawRect(player1.x, player1.y, player1.width, player1.height, player1.color);
+            drawRect(player2.x, player2.y, player2.width, player2.height, player2.color);
+            drawCircle(ball.x, ball.y, ball.radius, ball.color);
+
+            if (isServing && !isGameOver && !isPaused) {
+                drawText("READY...", 280, 250, "#33ff00", "30px");
+            }
+
+            if (isPaused && !isGameOver) {
+                // Dim background
+                context.fillStyle = "rgba(0, 0, 0, 0.5)";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                drawText("PAUSED", 300, 250, "#33ff00");
+            }
+
+            if (isGameOver) {
+                if (player1.score >= WINNING_SCORE) drawText("PLAYER 1 WINS!", 120, 200, "#33ff00");
+                else {
+                    let name = modeSelect.value === '1P' ? "CPU WINS!" : "PLAYER 2 WINS!";
+                    drawText(name, 160, 200, "#33ff00");
+                }
+            }
+        }
+
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function resetGame() {
+            player1.score = 0;
+            player2.score = 0;
+            isGameOver = false;
+            isPaused = false;
+            statusLabel.innerText = "FIRST TO 7 WINS";
+            updateScoreBoard();
+            resetBall();
+        }
+
+        updateLabels();
+        resetBall();
+        gameLoop();
+
+    </script>
+</body>
+</html>
